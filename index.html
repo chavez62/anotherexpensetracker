@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Personal Expense Tracker Application" />
+    <title>Expense Tracker Pro</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>Expense Tracker Pro</h1>
+        <div class="summary-cards">
+          <div class="summary-card">
+            <h3>Total Expenses</h3>
+            <p>$<span id="total-amount">0.00</span></p>
+          </div>
+          <div class="summary-card">
+            <h3>This Month</h3>
+            <p>$<span id="month-amount">0.00</span></p>
+          </div>
+          <div class="summary-card">
+            <h3>Average/Month</h3>
+            <p>$<span id="average-amount">0.00</span></p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Expense Form -->
+      <form id="expense-form" class="expense-form">
+        <div class="form-group">
+          <label for="expense-name">Expense Name</label>
+          <input
+            type="text"
+            id="expense-name"
+            placeholder="Enter expense name"
+            required
+            maxlength="50"
+          />
+        </div>
+        <div class="form-group">
+          <label for="expense-amount">Amount ($)</label>
+          <input
+            type="number"
+            id="expense-amount"
+            placeholder="Enter amount"
+            min="0.01"
+            step="0.01"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="expense-category">Category</label>
+          <select id="expense-category" required>
+            <option value="">Select a category</option>
+            <option value="food">Food & Dining</option>
+            <option value="transportation">Transportation</option>
+            <option value="utilities">Utilities</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="shopping">Shopping</option>
+            <option value="health">Healthcare</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="expense-date">Date</label>
+          <input type="date" id="expense-date" required />
+        </div>
+        <button type="submit" class="btn-add">Add Expense</button>
+      </form>
+
+      <!-- Filter and Sort Controls -->
+      <div class="controls">
+        <div class="filter-group">
+          <label for="filter-category">Filter by:</label>
+          <select id="filter-category">
+            <option value="all">All Categories</option>
+            <option value="food">Food & Dining</option>
+            <option value="transportation">Transportation</option>
+            <option value="utilities">Utilities</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="shopping">Shopping</option>
+            <option value="health">Healthcare</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="sort-group">
+          <label for="sort-by">Sort by:</label>
+          <select id="sort-by">
+            <option value="date-desc">Date (Newest)</option>
+            <option value="date-asc">Date (Oldest)</option>
+            <option value="amount-desc">Amount (Highest)</option>
+            <option value="amount-asc">Amount (Lowest)</option>
+          </select>
+        </div>
+        <button id="export-btn" class="btn-export">Export Data</button>
+      </div>
+
+      <!-- Expense Table -->
+      <div class="expense-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Expense</th>
+              <th>Category</th>
+              <th>Amount</th>
+              <th class="th-action">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="expense-list"></tbody>
+        </table>
+        <div id="no-expenses" class="no-expenses hidden">
+          No expenses found. Start by adding one!
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button id="prev-page" class="btn-page">Previous</button>
+        <span id="page-info">Page 1 of 1</span>
+        <button id="next-page" class="btn-page">Next</button>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Edit Expense</h2>
+          <span class="close-btn">&times;</span>
+        </div>
+        <form id="editForm">
+          <div class="form-group">
+            <label for="editName">Expense Name</label>
+            <input type="text" id="editName" required maxlength="50" />
+          </div>
+          <div class="form-group">
+            <label for="editAmount">Amount ($)</label>
+            <input
+              type="number"
+              id="editAmount"
+              min="0.01"
+              step="0.01"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="editCategory">Category</label>
+            <select id="editCategory" required>
+              <option value="food">Food & Dining</option>
+              <option value="transportation">Transportation</option>
+              <option value="utilities">Utilities</option>
+              <option value="entertainment">Entertainment</option>
+              <option value="shopping">Shopping</option>
+              <option value="health">Healthcare</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editDate">Date</label>
+            <input type="date" id="editDate" required />
+          </div>
+          <input type="hidden" id="editIndex" />
+          <button type="submit" class="btn-add">Update Expense</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
