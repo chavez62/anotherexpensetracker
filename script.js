@@ -42,7 +42,8 @@ const formatCurrency = (amount) => {
 };
 
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString("en-US", {
+  const date = new Date(dateString + "T00:00:00"); // Add explicit time to avoid timezone shifts
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -80,7 +81,8 @@ const loadExpenses = () => {
   } catch (error) {
     console.error("Error loading expenses:", error);
     expenses = [];
-    showToast("Error loading expenses", "error");
+    localStorage.removeItem(STORAGE_KEY); // Clear corrupted data
+    showToast("Error loading expenses. Data has been reset.", "error");
   }
 };
 
@@ -163,6 +165,7 @@ const renderExpenses = () => {
 
   // Pagination
   const totalPages = Math.ceil(sortedExpenses.length / ITEMS_PER_PAGE);
+  currentPage = Math.min(currentPage, totalPages || 1); // Prevent exceeding max page
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedExpenses = sortedExpenses.slice(
     startIndex,
@@ -212,23 +215,18 @@ const validateExpenseInput = (name, amount, category, date) => {
     return false;
   }
 
-  if (isNaN(amount) || amount <= 0) {
-    showToast("Please enter a valid positive amount", "error");
+  if (isNaN(amount) || amount <= 0 || amount > 999999) {
+    showToast("Please enter a valid amount (1-999999)", "error");
     return false;
   }
 
-  if (amount > 999999999) {
-    showToast("Amount is too large", "error");
+  if (!category || !CATEGORIES[category]) {
+    showToast("Please select a valid category", "error");
     return false;
   }
 
-  if (!category) {
-    showToast("Please select a category", "error");
-    return false;
-  }
-
-  if (!date) {
-    showToast("Please select a date", "error");
+  if (!date || isNaN(new Date(date).getTime())) {
+    showToast("Please select a valid date", "error");
     return false;
   }
 
@@ -252,7 +250,9 @@ const addExpense = (event) => {
     amount,
     category,
     date,
-    created: new Date().toISOString(),
+    created: new Date(new Date().setHours(0, 0, 0, 0))
+      .toISOString()
+      .split("T")[0], // Ensure local timezone handling
   });
 
   saveExpenses();
@@ -326,7 +326,7 @@ const exportToCSV = () => {
     ...expenses.map((expense) =>
       [
         expense.date,
-        `"${expense.name}"`,
+        `"${expense.name.replace(/"/g, '""')}"`,
         CATEGORIES[expense.category],
         expense.amount,
       ].join(","),
@@ -412,13 +412,12 @@ document.getElementById("expense-amount").addEventListener("input", (e) => {
 // Responsiveness Handler
 const handleResize = () => {
   const width = window.innerWidth;
-  if (width < 768) {
-    ITEMS_PER_PAGE = 5;
-  } else {
-    ITEMS_PER_PAGE = 10;
+  const newItemsPerPage = width < 768 ? 5 : 10;
+  if (ITEMS_PER_PAGE !== newItemsPerPage) {
+    ITEMS_PER_PAGE = newItemsPerPage;
+    currentPage = 1;
+    renderExpenses();
   }
-  currentPage = 1;
-  renderExpenses();
 };
 
 window.addEventListener("resize", handleResize);
@@ -446,21 +445,6 @@ const initTooltips = () => {
   });
 };
 
-// Performance Optimization
-const debounce = (func, wait) => {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-};
-
-const debouncedRender = debounce(renderExpenses, 100);
-
 // Error Boundary
 window.addEventListener("error", (event) => {
   console.error("Application error:", event.error);
@@ -469,4 +453,3 @@ window.addEventListener("error", (event) => {
 
 // Initialize the application
 initTooltips();
-handleResize();
