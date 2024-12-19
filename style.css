@@ -55,21 +55,25 @@ body {
 }
 
 .summary-card {
-  background: white; /* Simplified from gradient */
-  padding: 1.5rem;
+  background: linear-gradient(145deg, #ffffff, #f0f2f5);
+  padding: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
-  transition: transform 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05); /* Added subtle border */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .summary-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .summary-card h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .summary-card p {
